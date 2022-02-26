@@ -3,7 +3,7 @@ package src
 type tokenType string
 
 type token struct {
-	ttype   tokenType
+	Type    tokenType
 	literal string
 }
 
@@ -16,6 +16,15 @@ const (
 
 	ASSIGN = "="
 	PLUS   = "+"
+	MINUS  = "-"
+	STAR   = "*"
+	SLASH  = "/"
+
+	BANG   = "!"
+	EQ     = "=="
+	NOT_EQ = "!="
+	GT     = ">"
+	LT     = "<"
 
 	COMMA     = ","
 	SEMICOLON = ";"
@@ -27,6 +36,11 @@ const (
 
 	FUNCTION = "FN"
 	LET      = "LET"
+	TRUE     = "TRUE"
+	FALSE    = "FALSE"
+	IF       = "IF"
+	ELSE     = "ELSE"
+	RETURN   = "^"
 )
 
 var keywords = map[string]tokenType{

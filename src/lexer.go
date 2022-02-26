@@ -7,7 +7,7 @@ type Lexer struct {
 	ch           byte
 }
 
-func newLexer(input string) *Lexer {
+func NewLexer(input string) *Lexer {
 	l := &Lexer{input: input}
 	l.readChar()
 	return l
@@ -23,12 +23,18 @@ func (l *Lexer) readChar() {
 	l.readPosition += 1
 }
 
-func (l *Lexer) nextToken() token {
+func (l *Lexer) NextToken() token {
 	var tok token
 	l.skipWhitespace()
 	switch l.ch {
 	case '=':
-		tok = newToken(ASSIGN, l.ch)
+		if l.peekChar() == '=' {
+			ch := l.ch
+			l.readChar()
+			tok = token{Type: EQ, literal: string(ch) + string(l.ch)}
+		} else {
+			tok = newToken(ASSIGN, l.ch)
+		}
 	case ';':
 		tok = newToken(SEMICOLON, l.ch)
 	case '(':
@@ -39,6 +45,24 @@ func (l *Lexer) nextToken() token {
 		tok = newToken(COMMA, l.ch)
 	case '+':
 		tok = newToken(PLUS, l.ch)
+	case '-':
+		tok = newToken(MINUS, l.ch)
+	case '*':
+		tok = newToken(STAR, l.ch)
+	case '/':
+		tok = newToken(SLASH, l.ch)
+	case '!':
+		if l.peekChar() == '=' {
+			ch := l.ch
+			l.readChar()
+			tok = token{Type: NOT_EQ, literal: string(ch) + string(l.ch)}
+		} else {
+			tok = newToken(BANG, l.ch)
+		}
+	case '>':
+		tok = newToken(GT, l.ch)
+	case '<':
+		tok = newToken(LT, l.ch)
 	case '{':
 		tok = newToken(LBRACE, l.ch)
 	case '}':
@@ -56,10 +80,6 @@ func (l *Lexer) nextToken() token {
 	}
 	l.readChar()
 	return tok
-}
-
-func newToken[T byte | string](ttype tokenType, ch T) token {
-	return token{ttype: ttype, literal: string(ch)}
 }
 
 func (l *Lexer) readIdentifier() token {
@@ -84,6 +104,18 @@ func (l *Lexer) skipWhitespace() {
 	for l.ch == ' ' || l.ch == '\t' || l.ch == '\n' || l.ch == '\r' {
 		l.readChar()
 	}
+}
+
+func (l *Lexer) peekChar() byte {
+	if l.readPosition >= len(l.input) {
+		return 0
+	} else {
+		return l.input[l.readPosition]
+	}
+}
+
+func newToken[T byte | string](ttype tokenType, ch T) token {
+	return token{Type: ttype, literal: string(ch)}
 }
 
 func isLetter(ch byte) bool {
